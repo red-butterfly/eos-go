@@ -20,7 +20,6 @@ import (
 type API struct {
 	HttpClient              *http.Client
 	BaseURL                 string
-	ChainID                 []byte
 	Signer                  Signer
 	Debug                   bool
 	Compress                CompressionType
@@ -30,13 +29,11 @@ type API struct {
 	lastGetInfo      *InfoResp
 	lastGetInfoStamp time.Time
 	lastGetInfoLock  sync.Mutex
+
+	customGetRequiredKeys func(tx *Transaction) ([]ecc.PublicKey, error)
 }
 
-func New(baseURL string, chainID []byte) *API {
-	if len(chainID) != 32 {
-		panic("chainID must be 32 bytes")
-	}
-
+func New(baseURL string) *API {
 	api := &API{
 		HttpClient: &http.Client{
 			Transport: &http.Transport{
@@ -54,7 +51,6 @@ func New(baseURL string, chainID []byte) *API {
 			},
 		},
 		BaseURL:  baseURL,
-		ChainID:  chainID,
 		Compress: CompressionZlib,
 	}
 
@@ -101,57 +97,41 @@ func (api *API) EnableKeepAlives() bool {
 	return false
 }
 
+func (api *API) SetCustomGetRequiredKeys(f func(tx *Transaction) ([]ecc.PublicKey, error)) {
+	api.customGetRequiredKeys = f
+}
+
 func (api *API) SetSigner(s Signer) {
 	api.Signer = s
 }
 
-// Chain APIs
-// Wallet APIs
+// ProducerPause will pause block production on a nodeos with
+// `producer_api` plugin loaded.
+func (api *API) ProducerPause() error {
+	return api.call("producer", "pause", nil, nil)
+}
 
-// List here: https://github.com/Netherdrake/py-eos-api/blob/master/eosapi/client.py
+// ProducerResume will resume block production on a nodeos with
+// `producer_api` plugin loaded. Obviously, this needs to be a
+// producing node on the producers schedule for it to do anything.
+func (api *API) ProducerResume() error {
+	return api.call("producer", "resume", nil, nil)
+}
 
-// const string push_txn_func = chain_func_base + "/push_transaction";
-// const string push_txns_func = chain_func_base + "/push_transactions";
-// const string json_to_bin_func = chain_func_base + "/abi_json_to_bin";
-// const string get_block_func = chain_func_base + "/get_block";
-// const string get_account_func = chain_func_base + "/get_account";
-// const string get_table_func = chain_func_base + "/get_table_rows";
-// const string get_code_func = chain_func_base + "/get_code";
-// const string get_currency_balance_func = chain_func_base + "/get_currency_balance";
-// const string get_currency_stats_func = chain_func_base + "/get_currency_stats";
-// const string get_required_keys = chain_func_base + "/get_required_keys";
-
-// const string account_history_func_base = "/v1/account_history";
-// const string get_transaction_func = account_history_func_base + "/get_transaction";
-// const string get_transactions_func = account_history_func_base + "/get_transactions";
-// const string get_key_accounts_func = account_history_func_base + "/get_key_accounts";
-// const string get_controlled_accounts_func = account_history_func_base + "/get_controlled_accounts";
-
-// const string net_func_base = "/v1/net";
-// const string net_connect = net_func_base + "/connect";
-// const string net_disconnect = net_func_base + "/disconnect";
-// const string net_status = net_func_base + "/status";
-// const string net_connections = net_func_base + "/connections";
-
-// const string wallet_func_base = "/v1/wallet";
-// const string wallet_create = wallet_func_base + "/create";
-// const string wallet_open = wallet_func_base + "/open";
-// const string wallet_list = wallet_func_base + "/list_wallets";
-// const string wallet_list_keys = wallet_func_base + "/list_keys";
-// const string wallet_public_keys = wallet_func_base + "/get_public_keys";
-// const string wallet_lock = wallet_func_base + "/lock";
-// const string wallet_lock_all = wallet_func_base + "/lock_all";
-// const string wallet_unlock = wallet_func_base + "/unlock";
-// const string wallet_import_key = wallet_func_base + "/import_key";
-// const string wallet_sign_trx = wallet_func_base + "/sign_transaction";
+// IsProducerPaused queries the blockchain for the pause statement of
+// block production.
+func (api *API) IsProducerPaused() (out bool, err error) {
+	err = api.call("producer", "paused", nil, &out)
+	return
+}
 
 func (api *API) GetAccount(name AccountName) (out *AccountResp, err error) {
 	err = api.call("chain", "get_account", M{"account_name": name}, &out)
 	return
 }
 
-func (api *API) GetCode(account AccountName) (out *Code, err error) {
-	err = api.call("chain", "get_code", M{"account_name": account}, &out)
+func (api *API) GetCode(account AccountName) (out *GetCodeResp, err error) {
+	err = api.call("chain", "get_code", M{"account_name": account, "code_as_wasm": true}, &out)
 	return
 }
 
@@ -205,7 +185,7 @@ func (api *API) WalletSignTransaction(tx *SignedTransaction, chainID []byte, pub
 	err = api.call("wallet", "sign_transaction", []interface{}{
 		tx,
 		textKeys,
-		hex.EncodeToString(api.ChainID), // eventually, we should receive the `chainID` from somewhere instead.
+		hex.EncodeToString(chainID),
 	}, &out)
 	return
 }
@@ -232,16 +212,25 @@ func (api *API) SignPushTransaction(tx *Transaction, opts *TxOptions) (out *Push
 		return nil, err
 	}
 
-	resp, err := api.GetRequiredKeys(tx)
-	if err != nil {
-		return nil, fmt.Errorf("get_required_keys: %s", err)
+	var requiredKeys []ecc.PublicKey
+	if api.customGetRequiredKeys != nil {
+		requiredKeys, err = api.customGetRequiredKeys(tx)
+		if err != nil {
+			return nil, fmt.Errorf("custom_get_required_keys: %s", err)
+		}
+	} else {
+		resp, err := api.GetRequiredKeys(tx)
+		if err != nil {
+			return nil, fmt.Errorf("get_required_keys: %s", err)
+		}
+		requiredKeys = resp.RequiredKeys
 	}
 
 	stx := NewSignedTransaction(tx)
 
 	stx.estimateResources(*opts, api.DefaultMaxCPUUsageMS, api.DefaultMaxNetUsageWords)
 
-	signedTx, err := api.Signer.Sign(stx, api.ChainID, resp.RequiredKeys...)
+	signedTx, err := api.Signer.Sign(stx, api.lastGetInfo.ChainID, requiredKeys...)
 	if err != nil {
 		return nil, fmt.Errorf("signing through wallet: %s", err)
 	}
@@ -291,13 +280,13 @@ func (api *API) GetBlockByID(id string) (out *BlockResp, err error) {
 
 func (api *API) GetProducers() (out *ProducersResp, err error) {
 	/*
-+FC_REFLECT( eosio::chain_apis::read_only::get_producers_params, (json)(lower_bound)(limit) )
-+FC_REFLECT( eosio::chain_apis::read_only::get_producers_result, (rows)(total_producer_vote_weight)(more) ); */
+		+FC_REFLECT( eosio::chain_apis::read_only::get_producers_params, (json)(lower_bound)(limit) )
+		+FC_REFLECT( eosio::chain_apis::read_only::get_producers_result, (rows)(total_producer_vote_weight)(more) ); */
 	err = api.call("chain", "get_producers", nil, &out)
 	return
 }
 
-func (api *API) GetBlockByNum(num uint64) (out *BlockResp, err error) {
+func (api *API) GetBlockByNum(num uint32) (out *BlockResp, err error) {
 	err = api.call("chain", "get_block", M{"block_num_or_id": fmt.Sprintf("%d", num)}, &out)
 	//err = api.call("chain", "get_block", M{"block_num_or_id": num}, &out)
 	return

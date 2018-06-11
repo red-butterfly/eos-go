@@ -25,6 +25,39 @@ func AN(in string) AccountName    { return AccountName(in) }
 func ActN(in string) ActionName   { return ActionName(in) }
 func PN(in string) PermissionName { return PermissionName(in) }
 
+type AccountResourceLimit struct {
+	Used      int64  `json:"used"`
+	Available string `json:"available"`
+	Max       string `json:"max"`
+}
+
+type DelegatedBandwidth struct {
+	From      AccountName `json:"from"`
+	To        AccountName `json:"to"`
+	NetWeight Asset       `json:"net_weight"`
+	CPUWeight Asset       `json:"cpu_weight"`
+}
+
+type TotalResources struct {
+	Owner     AccountName `json:"owner"`
+	NetWeight Asset       `json:"net_weight"`
+	CPUWeight Asset       `json:"cpu_weight"`
+	RAMBytes  uint64      `json:"ram_bytes"`
+}
+
+type VoterInfo struct {
+	Owner             AccountName    `json:"owner"`
+	Proxy             AccountName    `json:"proxy"`
+	Producers         []AccountName  `json:"producers"`
+	Staked            string         `json:"staked"`
+	LastVoteWeight    string         `json:"last_vote_weight"`
+	ProxiedVoteWeight string         `json:"proxied_vote_weight"`
+	IsProxy           byte           `json:"is_proxy"`
+	DeferredTrxID     uint32         `json:"deferred_trx_id"`
+	LastUnstakeTime   BlockTimestamp `json:"last_unstake_time"`
+	Unstaking         Asset          `json:"unstaking"`
+}
+
 type CompressionType uint8
 
 const (
@@ -184,10 +217,10 @@ type WaitWeight struct {
 	Weight  uint16 `json:"weight"` // weight_type
 }
 
-type Code struct {
+type GetCodeResp struct {
 	AccountName AccountName `json:"account_name"`
 	CodeHash    string      `json:"code_hash"`
-	WAST        string      `json:"wast"` // TODO: decode into Go ast, see https://github.com/go-interpreter/wagon
+	WASM        string      `json:"wasm"`
 	ABI         ABI         `json:"abi"`
 }
 
