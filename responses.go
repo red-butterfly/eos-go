@@ -86,13 +86,13 @@ type AccountResp struct {
 	Created            JSONTime             `json:"created"`
 	RAMQuota           int64                `json:"ram_quota"`
 	RAMUsage           int64                `json:"ram_usage"`
-	NetWeight          string               `json:"net_weight"`
-	CPUWeight          string               `json:"cpu_weight"`
+	NetWeight          int64                `json:"net_weight"`
+	CPUWeight          int64                `json:"cpu_weight"`
 	NetLimit           AccountResourceLimit `json:"net_limit"`
 	CPULimit           AccountResourceLimit `json:"cpu_limit"`
 	Permissions        []Permission         `json:"permissions"`
 	TotalResources     TotalResources       `json:"total_resources"`
-	DelegatedBandwidth DelegatedBandwidth   `json:"delegated_bandwidth"`
+	DelegatedBandwidth DelegatedBandwidth   `json:"self_delegated_bandwidth"`
 	VoterInfo          VoterInfo            `json:"voter_info"`
 }
 
