@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	eos "github.com/eoscanada/eos-go"
+	eos "github.com/red-butterfly/eos-go"
 )
 
 func NewSetCodeTx(account eos.AccountName, wasmPath, abiPath string) (out *eos.Transaction, err error) {

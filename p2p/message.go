@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/eoscanada/eos-go"
+	"github.com/red-butterfly/eos-go"
 )
 
 type Message struct {

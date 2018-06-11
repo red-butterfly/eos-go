@@ -13,7 +13,7 @@ import (
 
 	"encoding/hex"
 
-	"github.com/eoscanada/eos-go"
+	"github.com/red-butterfly/eos-go"
 	"github.com/gin-gonic/gin/json"
 	"github.com/stretchr/testify/assert"
 )
@@ -21,7 +21,7 @@ import (
 func newAPI() (api *eos.API) {
 
 	api = eos.New("http://localhost:8888", bytes.Repeat([]byte{0}, 32))
-	//api = eos.New("http://stage0.eoscanada.com", bytes.Repeat([]byte{0}, 32))
+	//api = eos.New("http://stage0.red-butterfly.com", bytes.Repeat([]byte{0}, 32))
 
 	tr := &http.Transport{}
 	api.HttpClient = &http.Client{Transport: tr}

@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/eoscanada/eos-go"
-	"github.com/eoscanada/eos-go/ecc"
-	"github.com/eoscanada/eos-go/system"
+	"github.com/red-butterfly/eos-go"
+	"github.com/red-butterfly/eos-go/ecc"
+	"github.com/red-butterfly/eos-go/system"
 )
 
 func main() {
-	//api := eos.New(&url.URL{Scheme: "http", Host: "cbillett.eoscanada.com"}, bytes.Repeat([]byte{0}, 32))
+	//api := eos.New(&url.URL{Scheme: "http", Host: "cbillett.red-butterfly.com"}, bytes.Repeat([]byte{0}, 32))
 	//api := eos.New("http://35.203.101.218:8888", bytes.Repeat([]byte{0}, 32))
 	api := eos.New("http://localhost:8888")
 

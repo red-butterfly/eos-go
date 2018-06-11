@@ -1,7 +1,7 @@
 package system
 
 import (
-	"github.com/eoscanada/eos-go"
+	"github.com/red-butterfly/eos-go"
 )
 
 func init() {

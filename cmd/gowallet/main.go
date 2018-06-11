@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	eos "github.com/eoscanada/eos-go"
-	"github.com/eoscanada/eos-go/ecc"
+	eos "github.com/red-butterfly/eos-go"
+	"github.com/red-butterfly/eos-go/ecc"
 )
 
 // A drop-in Wallet server, mimics `keosd` using a KeyBag and the Go signature machinery.

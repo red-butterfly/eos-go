@@ -6,7 +6,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 
-	"github.com/eoscanada/eos-go/ecc"
+	"github.com/red-butterfly/eos-go/ecc"
 )
 
 type P2PMessage interface {

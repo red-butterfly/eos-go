@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/eoscanada/eos-go"
-	"github.com/eoscanada/eos-go/system"
+	"github.com/red-butterfly/eos-go"
+	"github.com/red-butterfly/eos-go/system"
 )
 
 var flagAccount = flag.String("account", "", "Account to set code")
@@ -18,7 +18,7 @@ var flagPrivKey = flag.String("key", "", "Private key to load to sign transactio
 func main() {
 	flag.Parse()
 
-	//	api := eos.New(&url.URL{Scheme: "http", Host: "cbillett.eoscanada.com"}, bytes.Repeat([]byte{0}, 32))
+	//	api := eos.New(&url.URL{Scheme: "http", Host: "cbillett.red-butterfly.com"}, bytes.Repeat([]byte{0}, 32))
 	api := eos.New("http://localhost:9999", bytes.Repeat([]byte{0}, 32))
 	// api := eos.New(&url.URL{Scheme: "http", Host: "localhost:8889"}, bytes.Repeat([]byte{0}, 32))
 

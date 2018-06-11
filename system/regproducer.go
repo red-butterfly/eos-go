@@ -1,8 +1,8 @@
 package system
 
 import (
-	eos "github.com/eoscanada/eos-go"
-	"github.com/eoscanada/eos-go/ecc"
+	eos "github.com/red-butterfly/eos-go"
+	"github.com/red-butterfly/eos-go/ecc"
 )
 
 // NewRegProducer returns a `regproducer` action that lives on the

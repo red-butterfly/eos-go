@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"reflect"
 
-	"github.com/eoscanada/eos-go/ecc"
+	"github.com/red-butterfly/eos-go/ecc"
 )
 
 /*

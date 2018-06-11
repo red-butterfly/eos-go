@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/eoscanada/eos-go"
-	"github.com/eoscanada/eos-go/cmd/eos-mega-tx/random"
-	"github.com/eoscanada/eos-go/ecc"
-	"github.com/eoscanada/eos-go/system"
-	"github.com/eoscanada/eos-go/token"
+	"github.com/red-butterfly/eos-go"
+	"github.com/red-butterfly/eos-go/cmd/eos-mega-tx/random"
+	"github.com/red-butterfly/eos-go/ecc"
+	"github.com/red-butterfly/eos-go/system"
+	"github.com/red-butterfly/eos-go/token"
 	"github.com/satori/go.uuid"
 )
 
