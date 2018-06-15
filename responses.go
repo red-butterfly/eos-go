@@ -96,6 +96,10 @@ type AccountResp struct {
 	VoterInfo          VoterInfo            `json:"voter_info"`
 }
 
+type AccountKeyResp struct {
+	Accounts 			[]AccountName 		`json:"account_names"`
+}
+
 type CurrencyBalanceResp struct {
 	EOSBalance        Asset    `json:"eos_balance"`
 	StakedBalance     Asset    `json:"staked_balance"`
@@ -233,3 +237,4 @@ type NetDisconnectResp string
 type ProducersResp struct {
 	// TODO: fill this in !
 }
+

@@ -297,6 +297,11 @@ func (api *API) GetBlockByNumOrID(query string) (out *SignedBlock, err error) {
 	return
 }
 
+func (api *API) GetKeyAccounts(key string) (out *AccountKeyResp, err error) {
+	err = api.call("history", "get_key_accounts", M{"public_key": key}, &out)
+	return
+}
+
 func (api *API) GetTransaction(id string) (out *TransactionResp, err error) {
 	err = api.call("account_history", "get_transaction", M{"transaction_id": id}, &out)
 	return
