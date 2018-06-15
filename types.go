@@ -27,8 +27,8 @@ func PN(in string) PermissionName { return PermissionName(in) }
 
 type AccountResourceLimit struct {
 	Used      int64  `json:"used"`
-	Available string `json:"available"`
-	Max       string `json:"max"`
+	Available int64 `json:"available"`
+	Max       int64 `json:"max"`
 }
 
 type DelegatedBandwidth struct {
@@ -49,7 +49,7 @@ type VoterInfo struct {
 	Owner             AccountName    `json:"owner"`
 	Proxy             AccountName    `json:"proxy"`
 	Producers         []AccountName  `json:"producers"`
-	Staked            string         `json:"staked"`
+	Staked            int64         `json:"staked"`
 	LastVoteWeight    string         `json:"last_vote_weight"`
 	ProxiedVoteWeight string         `json:"proxied_vote_weight"`
 	IsProxy           byte           `json:"is_proxy"`
