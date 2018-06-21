@@ -13,8 +13,8 @@ import (
 	"time"
 	"math"
 
-	"github.com/eoscanada/eos-go"
-	"github.com/eoscanada/eos-go/ecc"
+	"github.com/red-butterfly/eos-go"
+	"github.com/red-butterfly/eos-go/ecc"
 )
 
 type loggerWriter struct {
